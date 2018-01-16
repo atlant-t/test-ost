@@ -1,0 +1,17 @@
+{
+  "name": "ost",
+  "version": "0.0.0",
+  "main": "index.js",
+  "author": "atlant-t <atlant-t@bk.ru>",
+  "license": "MIT",
+  "scripts": {
+    "start": "yarn static-server src",
+    "dev": "yarn browser-sync start --config 'bs-config.js'"
+  },
+  "dependencies": {
+    "static-server": "^3.0.0"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.23.5"
+  }
+}
