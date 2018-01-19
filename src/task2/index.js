@@ -16,7 +16,11 @@ function parceStr(str) {
 	var reg = /\??([^=]*)=([^&]*)[&]?/g;
 	var i;
 	while (i = reg.exec(str)) {
-		result.push([i[1]].concat(i[2].split(',')));
+		result.push([i[1]].concat(
+			i[2]
+			.replace(/%([^;]*);/g, function(str, char) {return decodeChar(+char)})
+			.split(',')
+		));
 	}
 	return result.length ? result : null;
 }
@@ -40,7 +44,7 @@ function check(name, value) {
 }
 
 function log() {
-	var element = document.querySelectorAll('#form').elements;
+	var element = document.querySelector('#form').elements;
 	var keys = {};
 	var result = [];
 	for (var i = 0; i < element.length; i++) {
@@ -50,12 +54,17 @@ function log() {
 		if (element[i] instanceof HTMLInputElement) {
 			if (element[i].checked) {
 				if (!keys[name]) keys[name] = [];
-				keys[name].push(element[i].getAttribute('value'));
+				keys[name].push(element[i].getAttribute('value')
+					.replace(/[^\s\w]/g, encodeChar)
+				);
 			}
-		} else if (element[i] instanceof HTMLOptionElement) {
-			if (element[i].selected) {
-				if (!keys[name]) keys[name] = [];
-				keys[name].push(element[i].getAttribute('value'));
+		} else if (element[i] instanceof HTMLSelectElement) {
+			var selectedList = element[i].selectedOptions;
+			if (selectedList.length && !keys[name]) keys[name] = [];
+			for (var n = 0; n < selectedList.length; n++) {
+				keys[name].push(selectedList[n].getAttribute('value')
+					.replace(/[^\s\w]/g, encodeChar)
+				);
 			}
 		}
 	}
@@ -65,6 +74,13 @@ function log() {
 		result.push(key + '=' + keys[key].join(','));
 	}
 	console.log(location.origin + location.pathname + '?' + result.join('&'));
+}
+
+function encodeChar(char) {
+	return '%' + char.charCodeAt(0) + ';';
+}
+function decodeChar(code) {
+	return String.fromCharCode(code);
 }
 
 document.addEventListener('DOMContentLoaded', f);

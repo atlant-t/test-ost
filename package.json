@@ -5,7 +5,7 @@
   "author": "atlant-t <atlant-t@bk.ru>",
   "license": "MIT",
   "scripts": {
-    "start": "yarn static-server src",
+    "start": "yarn static-server src -p 3000",
     "dev": "yarn browser-sync start --config 'bs-config.js'"
   },
   "dependencies": {
