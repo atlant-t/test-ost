@@ -1,20 +1,29 @@
 function f() {
 	listInputs = document.querySelectorAll(".js_name");
 	listInputs.forEach(function(input){
-		input.addEventListener('input', inner)
+		new NameInput(input);
 	});
-}
-function inner(event) {
-	var element = event.target,
-		value = element.getAttribute('value')
-	var setValue = element.value
+};
 
-	if (value !== setValue) {
-		element.classList.add('red');
-	} else {
-		element.classList.remove('red');
+document.addEventListener('DOMContentLoaded', f);
+
+class NameInput {
+	constructor(element) {
+		this._element     = element;
+		this._valideValue = element.getAttribute('value')
+		document.addEventListener(
+			'input',
+			event => {if (event.target == this._element) this._onInput()}
+		);
 	}
-
-	console.log(setValue)
-}
-document.addEventListener('DOMContentLoaded', f)
+	_onInput(event) {
+		if (this._isValidated(this._element.value)) {
+			this._element.classList.remove('red');
+		} else {
+			this._element.classList.add('red');
+		}
+	}
+	_isValidated(str) {
+		return str === this._valideValue
+	}
+};

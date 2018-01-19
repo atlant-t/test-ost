@@ -8,47 +8,45 @@ function f() {
 	}
 }
 
-function Database(frame) {
-	this._name = frame.id;
-	this._source = frame.src;
-	this._frame = frame;
-}
-Database.prototype._idCounter = 0;
-Database.prototype._frame;
-Database.prototype._source;
-Database.prototype._generateId = function() {
-	return this._name + '_' + this._idCounter++;
-}
-Database.prototype._send = function(data, callback) {
-	var safe = this;
-
-	this._frame.contentWindow.postMessage(data, this._source);
-
-	if (callback) {
-		function handler(e) {
-			if (e.source !== safe._frame.contentWindow) return;
-			if (e.data._id !== data._id) return;
-			window.removeEventListener('message', handler);
-			callback(e.data.data);
-		}
-		window.addEventListener('message', handler)
+class Database {
+	constructor(frame) {
+		this._idCounter = 0;
+		this._frame     = frame;
+		this._name      = frame.id;
+		this._source    = frame.src;
 	}
-}
-Database.prototype.setLocalStorage = function(data, callback) {
-	var dataSetLocalStorage = {
-		_id: this._generateId(),
-		command: 'setLocalStorage',
-		data: data
-	};
-	this._send(dataSetLocalStorage, callback);
-}
-Database.prototype.removeLocalStorage = function(data, callback) {
-	var dataSetLocalStorage = {
-		_id: this._generateId(),
-		command: 'removeLocalStorage',
-		data: data
-	};
-	this._send(dataSetLocalStorage, callback);
+	_generateId() {
+		return this._name + '_' + this._idCounter++;
+	}
+	_send(data, callback) {
+		this._frame.contentWindow.postMessage(data, this._source);
+
+		if (callback) {
+			let handler = event => {
+				if (event.source !== this._frame.contentWindow) return;
+				if (event.data._id !== data._id) return;
+				window.removeEventListener('message', handler);
+				callback(event.data.data);
+			}
+			window.addEventListener('message', handler)
+		}
+	}
+	setLocalStorage(data, callback) {
+		let dataSetLocalStorage = {
+			_id: this._generateId(),
+			command: 'setLocalStorage',
+			data: data
+		};
+		this._send(dataSetLocalStorage, callback);
+	}
+	removeLocalStorage(data, callback) {
+		var dataRemoveLocalStorage = {
+			_id: this._generateId(),
+			command: 'removeLocalStorage',
+			data: data
+		};
+		this._send(dataRemoveLocalStorage, callback);
+	}
 }
 
 document.addEventListener('DOMContentLoaded', f);
